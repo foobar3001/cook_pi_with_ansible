@@ -1,0 +1,11 @@
+defaults:
+   new_ansible_ssh_user: "foobar3000"
+   host_var:
+     router_ip: "192.168.0.1"
+     dns_ip: "192.168.0.64"
+  
+hosts:
+    "192.168.0.28": 
+        new_ip_cidr: "192.168.0.68/24"
+        new_ansible_ssh_user: "foobar3000"
+   

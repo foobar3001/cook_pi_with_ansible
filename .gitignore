@@ -1,0 +1,5 @@
+# 失敗時にansibleが生成するファイル
+*.retry
+
+# パスワードが記載されたファイル
+vars/users.yml

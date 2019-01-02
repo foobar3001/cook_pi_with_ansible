@@ -1,0 +1,85 @@
+- hosts: all
+  vars_files:
+    - ./vars/users.yml
+  become: true
+  tasks:
+
+    - name: add a user
+      user: 
+        name: "{{ item.key }}"
+        password: "{{ item.value.password|password_hash('sha512') }}"
+        update_password: on_create
+        shell: "{{ item.value.shell }}"
+      with_dict: "{{ users }}"
+    
+    - name: set group to user
+      user: 
+        name: "{{ item.key }}"
+        groups: "{{ item.value.groups }}"
+        append: yes
+      when: item.value.groups is defined
+      with_dict: "{{ users }}"
+
+    - name: mkdir .ssh
+      file:
+        dest: "/home/{{ item.key }}/.ssh"
+        owner: "{{ item.key }}"
+        group: "{{ item.key }}"
+        state: directory
+        mode: 0700
+      with_dict: "{{ users }}"
+      when: item.value.ssh_enable
+
+    - name: add authorized keys
+      copy:
+        src: ~/.ssh/id_rsa.pub
+        dest: "/home/{{ item.key }}/.ssh/authorized_keys"
+        owner: "{{ item.key }}"
+        group: "{{ item.key }}"
+        mode: 0600
+      with_dict: "{{ users }}"
+      when: item.value.ssh_enable
+
+    - name: set sshd_config
+      lineinfile: 
+         dest: '/etc/ssh/sshd_config'
+         state: present
+         backrefs: yes
+         regexp: '{{ item.regexp }}'
+         line: '{{ item.line }}'
+      with_items:
+         - regexp: '^#?\s*PermitEmptyPasswords'
+           line: 'PermitEmptyPasswords no'
+         - regexp: '^#?\s*ChallengeResponseAuthentication'
+           line: 'ChallengeResponseAuthentication no'
+         - regexp: '^#?\s*PermitRootLogin'
+           line: 'PermitRootLogin no' 
+         - regexp: '^#?\s*SyslogFacility'
+           line: 'SyslogFacility AUTHPRIV' 
+         - regexp: '^#?\s*LogLevel'
+           line: 'LogLevel VERBOSE' 
+         - regexp: '^# PasswordAuthentication'
+           line: 'PasswordAuthentication no' 
+
+    - name: set static ip address
+      blockinfile:
+        path: '/etc/dhcpcd.conf'
+        block: |
+          interface wlan0
+          static ip_address={{ new_ip_cidr }}
+          static routers={{ router_ip }}
+          static domain_name_servers={{ dns_ip }}
+ 
+    - name: reboot machine
+      shell: "sleep 2 && reboot"
+      async: 100
+      poll: 0 
+
+    - name: wait for ssh port up
+      local_action:
+        module: wait_for
+        host: "{{ new_ip }}"
+        port: 22
+        state: started
+        delay: 10
+ 

@@ -1,0 +1,20 @@
+# これはサンプルファイルです
+# users.xmlに改名し、以下のコマンドを実行して暗号化してください
+# ansible-vault encrypt users.xml
+#
+# パラメータ説明
+#    password: 必須
+#    groups: 任意（ユーザ名のグループは自動で生成される）
+#    shell: 必須
+#    ssh_enable: 必須（enableの場合は公開鍵が設定される）
+users:
+  foobar3000:
+    password: p@ssw0rd
+    groups: sudo
+    shell: /bin/bash
+    ssh_enable: true
+
+  admin:
+    password: p@ssw0rd
+    shell: /bin/bash
+    ssh_enable: false
