@@ -46,8 +46,8 @@ def deepupdate(dict_base, other):
     for k, v in other.items():
         if isinstance(v, dict) and k in dict_base:
             deepupdate(dict_base[k], v)
-    else:
-        dict_base[k] = v
+        else:
+            dict_base[k] = v
 
 
 if __name__ == '__main__':
@@ -68,9 +68,12 @@ if __name__ == '__main__':
     for host, setting in hosts.items():
         # デフォルト値と各ホスト値をマージ
         host_setting = defaults.copy()
+        print(host_setting)
+        print(setting)
         deepupdate(host_setting, setting)
 
         # CIDR表記のIPをIP部分とサブネット部分に分離する
+        print(host_setting)
         new_ip_cidr = host_setting["new_ip_cidr"]
         new_ip = re.match('(.*)/(.*)', new_ip_cidr).group(1)
 
