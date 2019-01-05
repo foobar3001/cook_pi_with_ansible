@@ -21,7 +21,7 @@ import subprocess
 import json
 import yaml
 import re
-
+import copy
 
 # コマンドを利用したpingの実行
 # 参照元ページ
@@ -67,13 +67,10 @@ if __name__ == '__main__':
     # ホスト毎に設定
     for host, setting in hosts.items():
         # デフォルト値と各ホスト値をマージ
-        host_setting = defaults.copy()
-        print(host_setting)
-        print(setting)
+        host_setting = copy.deepcopy(defaults)
         deepupdate(host_setting, setting)
 
         # CIDR表記のIPをIP部分とサブネット部分に分離する
-        print(host_setting)
         new_ip_cidr = host_setting["new_ip_cidr"]
         new_ip = re.match('(.*)/(.*)', new_ip_cidr).group(1)
 

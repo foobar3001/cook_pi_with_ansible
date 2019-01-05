@@ -5,7 +5,8 @@ defaults:
      dns_ip: "192.168.0.64"
   
 hosts:
-    "192.168.0.28": 
+    "192.168.0.26": 
+        new_ip_cidr: "192.168.0.67/24"
+
+    "192.168.0.15": 
         new_ip_cidr: "192.168.0.68/24"
-        new_ansible_ssh_user: "foobar3000"
-   
