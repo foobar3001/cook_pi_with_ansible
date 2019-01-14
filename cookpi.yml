@@ -1,17 +1,15 @@
 - hosts: all
   vars_files:
     - ./vars/users.yml
+    - ./vars/passwords.yml
   become: true
   tasks:
-
     - name: add a user
       user: 
         name: "{{ item.key }}"
-        password: "{{ item.value.password|password_hash('sha512') }}"
-        update_password: on_create
         shell: "{{ item.value.shell }}"
       with_dict: "{{ users }}"
-    
+
     - name: set group to user
       user: 
         name: "{{ item.key }}"
@@ -19,6 +17,13 @@
         append: yes
       when: item.value.groups is defined
       with_dict: "{{ users }}"
+
+    - name: set password to user
+      user:
+        name: "{{ item.key }}"
+        password: "{{ item.value.password|password_hash('sha512') }}"
+      with_dict: "{{ passwords }}"
+      no_log: True
 
     - name: mkdir .ssh
       file:
@@ -65,7 +70,7 @@
       blockinfile:
         path: '/etc/dhcpcd.conf'
         block: |
-          interface wlan0
+          interface {{ interface_name }}
           static ip_address={{ new_ip_cidr }}
           static routers={{ router_ip }}
           static domain_name_servers={{ dns_ip }}
