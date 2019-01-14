@@ -1,17 +1,12 @@
 defaults:
-   new_ansible_ssh_user: "foobar3000"
+   new_ansible_ssh_user: "myuser"
    host_var:
      interface_name: "wlan0"
-     router_ip: "192.168.0.1"
-     dns_ip: "192.168.0.64"
+     router_ip: "10.0.2.1"
+     dns_ip: "10.0.2.1"
   
 hosts:
     "10.0.2.6": 
         new_ip_cidr: "10.0.2.70/24"
         host_var:
             interface_name: "eth0"
-            router_ip: "10.0.2.1"
-            dns_ip: "10.0.2.1" 
-
-            #    "192.168.0.15": 
-            #new_ip_cidr: "192.168.0.68/24"
